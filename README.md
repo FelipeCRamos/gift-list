@@ -43,6 +43,15 @@ No credentials are required today — the app boots against seeded in-memory
 repositories. When Supabase is wired up, copy `.env.example` → `.env` and fill in
 `SUPABASE_URL` / `SUPABASE_ANON_KEY` (injected via `--dart-define`).
 
+### Exploring the seed data (mock backend)
+
+Sign in with any non-empty password:
+
+- `demo@giftlist.dev` — the seeded **creator** (owns three sample lists).
+- `guest@giftlist.dev` — an allowlisted guest for the private wedding list.
+
+Sample public list slug: `casa-nova-ana` (`/l/casa-nova-ana`).
+
 ## Common commands
 
 ```bash

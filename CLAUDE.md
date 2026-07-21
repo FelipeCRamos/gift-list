@@ -103,9 +103,10 @@ their repositories as **named required constructor params**. Feature cubits are
 provided at the **route level** via `BlocProvider`; the only root-scoped cubit is
 `AuthCubit`.
 
-Cubit → feature map: `AuthCubit` (root) · `ProfileCubit` · `ListsCubit` +
-`ListEditorCubit` (lists) · `AllowlistCubit` · `ItemsCubit` · `ListGateCubit` +
-`PublicListCubit` (public_list) · `GiftCubit` (contribute) · `ContributionsCubit`.
+Cubit → feature map: `AuthCubit` (root) · `AuthFormCubit` (auth — `/auth` form
+lifecycle) · `ProfileCubit` · `ListsCubit` + `ListEditorCubit` (lists) ·
+`AllowlistCubit` · `ItemsCubit` · `ListGateCubit` + `PublicListCubit`
+(public_list) · `GiftCubit` (contribute) · `ContributionsCubit`.
 
 ### Dependency injection — **`provider` `MultiRepositoryProvider`**
 Repositories are injected once at the app root in `app.dart`. Cubits read them
@@ -174,8 +175,11 @@ session; `/l/:slug` is gated dynamically per the list's visibility/auth settings
 - Layer suffixes: `*_repository.dart` (interface), `*_repository_impl` lives under
   `data/repositories/{mock,supabase}/`; `*_cubit.dart` / `*_state.dart`;
   `{feature}_routes.dart`.
-- Design-system widgets: `gl_*_widget.dart` with `Gl`-prefixed classes
-  (`GlTheme`, `GlPrimaryButton`, …), barrel-exported.
+- Design-system widgets: `gl_*.dart` files with `Gl`-prefixed classes
+  (`GlPageScaffold`, `GlFormLayout`, `GlAsyncView`, `GlBusyButton`,
+  `GlEmptyState`, `GlListCard`), barrel-exported from
+  `core/widgets/widgets.dart`. Build screens from these rather than raw Material
+  scaffolds/buttons so pages stay consistent.
 
 ## Important Patterns
 

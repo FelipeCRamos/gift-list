@@ -91,13 +91,17 @@ length-capped (`core/formatting/ascii_sanitize.dart`) before entering the BR Cod
 
 ## Build phases (roadmap)
 
-Mock-backed through phase 7; Supabase in phase 8. Detail in the plan / spec §13.
+Mock-backed through the contribute flow; Supabase later. Detail in the plan /
+spec §13.
 
-1. Foundations (models, repo interfaces + mocks, DI, router skeleton)
-2. Pix core (EMV + CRC16), test-first
-3. Auth + Profile
-4. Creator dashboard (lists/editor, items, allowlist)
-5. Public list + access gate
+1. Foundations (models, repo interfaces + mocks, DI, router skeleton) — **done**
+2. Auth + Profile (AuthCubit, `/auth`, profile) — **done**; plus the `gl_`
+   shared widget library in `core/widgets/`
+3. Creator dashboard (lists/editor with private-locks-login, items, allowlist)
+   — **done**
+4. Public list + access gate
+5. Pix core (EMV + CRC16), test-first — **deferred to here** (only the contribute
+   flow needs it; nothing else depends on it)
 6. Contribute flow (QR + copia-e-cola + "I've paid")
 7. Contributions inbox + lazy expiry
 8. Supabase wiring (schema, RLS, RPCs, storage; swap DI)
