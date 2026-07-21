@@ -19,6 +19,8 @@
 #   Reads ./.env if present (SUPABASE_URL, SUPABASE_ANON_KEY) and forwards them
 #   to Flutter as --dart-define. Missing .env is fine while on mock repositories.
 #
+# Portable to Bash 3.2 (the default on macOS) — no mapfile/associative arrays.
+#
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -34,16 +36,22 @@ else
   DART=(dart)
 fi
 
-# Collect --dart-define args from .env (if present). Never fails when absent.
-dart_defines() {
-  local defines=()
+# Populates the global DEFINES array with --dart-define args from .env (if any).
+DEFINES=()
+load_dart_defines() {
+  DEFINES=()
   if [[ -f "$ROOT_DIR/.env" ]]; then
     # shellcheck disable=SC1091
-    set -a; source "$ROOT_DIR/.env"; set +a
-    [[ -n "${SUPABASE_URL:-}" ]]      && defines+=("--dart-define=SUPABASE_URL=$SUPABASE_URL")
-    [[ -n "${SUPABASE_ANON_KEY:-}" ]] && defines+=("--dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY")
+    set -a
+    source "$ROOT_DIR/.env"
+    set +a
+    if [[ -n "${SUPABASE_URL:-}" ]]; then
+      DEFINES+=("--dart-define=SUPABASE_URL=$SUPABASE_URL")
+    fi
+    if [[ -n "${SUPABASE_ANON_KEY:-}" ]]; then
+      DEFINES+=("--dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY")
+    fi
   fi
-  printf '%s\n' "${defines[@]:-}"
 }
 
 usage() {
@@ -52,22 +60,27 @@ usage() {
   awk 'NR==1{next} /^#/{sub(/^# ?/,""); print; next} {exit}' "${BASH_SOURCE[0]}"
 }
 
-cmd="${1:-}"; shift || true
+cmd="${1:-}"
+shift || true
 case "$cmd" in
   run)
     device="${1:-chrome}"
-    mapfile -t DEFINES < <(dart_defines)
-    exec "${FLUTTER[@]}" run -d "$device" "${DEFINES[@]}"
+    load_dart_defines
+    exec "${FLUTTER[@]}" run -d "$device" ${DEFINES[@]+"${DEFINES[@]}"}
     ;;
   build)
-    mapfile -t DEFINES < <(dart_defines)
-    exec "${FLUTTER[@]}" build web "${DEFINES[@]}" "$@"
+    load_dart_defines
+    exec "${FLUTTER[@]}" build web ${DEFINES[@]+"${DEFINES[@]}"} "$@"
     ;;
   analyze)
     exec "${FLUTTER[@]}" analyze "$@"
     ;;
   format)
-    exec "${DART[@]}" format "${@:-.}"
+    if [[ $# -gt 0 ]]; then
+      exec "${DART[@]}" format "$@"
+    else
+      exec "${DART[@]}" format .
+    fi
     ;;
   test)
     exec "${FLUTTER[@]}" test "$@"
