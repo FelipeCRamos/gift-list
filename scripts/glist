@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+# glist — Gift Registry developer CLI
+#
+# A single self-documenting entrypoint for building, running, and checking the
+# Flutter Web app. Wraps `flutter`/`dart` so contributors don't memorize flags.
+#
+# Usage:
+#   ./scripts/glist run [device]      Run the web app (default device: chrome)
+#   ./scripts/glist build             Build a web release (build/web)
+#   ./scripts/glist analyze           Static analysis (run after every change)
+#   ./scripts/glist format            Format all Dart code
+#   ./scripts/glist test [args...]    Run tests (extra args passed through)
+#   ./scripts/glist check             analyze + format --set-exit-if-changed + test
+#   ./scripts/glist get               flutter pub get
+#   ./scripts/glist supabase <cmd>    (stub) Supabase migrations — wired in phase 8
+#
+# Environment:
+#   Reads ./.env if present (SUPABASE_URL, SUPABASE_ANON_KEY) and forwards them
+#   to Flutter as --dart-define. Missing .env is fine while on mock repositories.
+#
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$ROOT_DIR"
+
+# Prefer the FVM-pinned Flutter if available, else the Flutter on PATH.
+if command -v fvm >/dev/null 2>&1 && [[ -d "$ROOT_DIR/.fvm" ]]; then
+  FLUTTER=(fvm flutter)
+  DART=(fvm dart)
+else
+  FLUTTER=(flutter)
+  DART=(dart)
+fi
+
+# Collect --dart-define args from .env (if present). Never fails when absent.
+dart_defines() {
+  local defines=()
+  if [[ -f "$ROOT_DIR/.env" ]]; then
+    # shellcheck disable=SC1091
+    set -a; source "$ROOT_DIR/.env"; set +a
+    [[ -n "${SUPABASE_URL:-}" ]]      && defines+=("--dart-define=SUPABASE_URL=$SUPABASE_URL")
+    [[ -n "${SUPABASE_ANON_KEY:-}" ]] && defines+=("--dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY")
+  fi
+  printf '%s\n' "${defines[@]:-}"
+}
+
+usage() {
+  # Print the leading comment block (skip the shebang), stopping at the first
+  # non-comment line, and strip the leading "# ".
+  awk 'NR==1{next} /^#/{sub(/^# ?/,""); print; next} {exit}' "${BASH_SOURCE[0]}"
+}
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  run)
+    device="${1:-chrome}"
+    mapfile -t DEFINES < <(dart_defines)
+    exec "${FLUTTER[@]}" run -d "$device" "${DEFINES[@]}"
+    ;;
+  build)
+    mapfile -t DEFINES < <(dart_defines)
+    exec "${FLUTTER[@]}" build web "${DEFINES[@]}" "$@"
+    ;;
+  analyze)
+    exec "${FLUTTER[@]}" analyze "$@"
+    ;;
+  format)
+    exec "${DART[@]}" format "${@:-.}"
+    ;;
+  test)
+    exec "${FLUTTER[@]}" test "$@"
+    ;;
+  check)
+    "${FLUTTER[@]}" analyze
+    "${DART[@]}" format --set-exit-if-changed .
+    "${FLUTTER[@]}" test
+    ;;
+  get)
+    exec "${FLUTTER[@]}" pub get
+    ;;
+  supabase)
+    echo "supabase commands are a stub until phase 8 (schema, RLS, RPCs, storage)." >&2
+    echo "Planned: 'glist supabase push' / 'glist supabase reset' via the Supabase CLI." >&2
+    exit 1
+    ;;
+  ""|-h|--help|help)
+    usage
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo >&2
+    usage
+    exit 1
+    ;;
+esac
