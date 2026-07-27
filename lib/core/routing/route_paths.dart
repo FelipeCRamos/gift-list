@@ -18,6 +18,9 @@ abstract final class RoutePaths {
   static const String listContributions = '/dashboard/lists/:id/contributions';
 
   // Builders for navigation.
+  /// `/auth` with a `from` location to return to after signing in.
+  static String authFrom(String location) =>
+      '$auth?from=${Uri.encodeQueryComponent(location)}';
   static String toListView(String slug) => '/l/$slug';
   static String toGift(String slug, String itemId) => '/l/$slug/gift/$itemId';
   static String toThanks(String slug) => '/l/$slug/thanks';

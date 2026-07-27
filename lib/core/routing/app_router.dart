@@ -9,6 +9,7 @@ import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/items/presentation/item_routes.dart';
 import '../../features/lists/presentation/list_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
+import '../../features/public_list/presentation/public_routes.dart';
 import '../widgets/placeholder_page.dart';
 import 'route_paths.dart';
 
@@ -28,7 +29,8 @@ GoRouter createRouter(AuthCubit authCubit) {
         return RoutePaths.auth;
       }
       if (atAuth && authed) {
-        return RoutePaths.dashboard;
+        final String? from = state.uri.queryParameters['from'];
+        return (from != null && from.isNotEmpty) ? from : RoutePaths.dashboard;
       }
       return null;
     },
@@ -37,13 +39,7 @@ GoRouter createRouter(AuthCubit authCubit) {
         path: RoutePaths.landing,
         builder: (context, state) => _Landing(),
       ),
-      GoRoute(
-        path: RoutePaths.listView,
-        builder: (context, state) => PlaceholderPage(
-          title: 'List: ${state.pathParameters['slug']}',
-          phase: 'Public list + gate — Phase 5',
-        ),
-      ),
+      ...PublicListRoutes.routes,
       GoRoute(
         path: RoutePaths.gift,
         builder: (context, state) => const PlaceholderPage(

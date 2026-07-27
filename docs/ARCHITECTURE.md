@@ -99,7 +99,8 @@ spec §13.
    shared widget library in `core/widgets/`
 3. Creator dashboard (lists/editor with private-locks-login, items, allowlist)
    — **done**
-4. Public list + access gate
+4. Public list + access gate (ListGateCubit's 5 states + PII-free progress;
+   `/auth?from=` returns contributors to the list after sign-in) — **done**
 5. Pix core (EMV + CRC16), test-first — **deferred to here** (only the contribute
    flow needs it; nothing else depends on it)
 6. Contribute flow (QR + copia-e-cola + "I've paid")
