@@ -452,6 +452,32 @@ class InMemoryGiftRegistryRepository implements GiftRegistryRepository {
     if (list.contributorAuth == ContributorAuth.loginRequired && _uid == null) {
       throw const NotAuthenticatedException();
     }
+
+    // Enforce availability (allow_partial cap / whole-item reservation). The
+    // repository is authoritative; the cubit mirrors this for UX.
+    if (data.amountCents < 1) {
+      throw const ValidationException('Amount must be greater than zero.');
+    }
+    final ItemProgress progress = _progressFor(item);
+    final int remaining =
+        item.targetAmountCents -
+        progress.confirmedCents -
+        progress.reservedCents;
+    if (item.allowPartial) {
+      if (data.amountCents > remaining) {
+        throw const ValidationException(
+          'That is more than the amount still open for this item.',
+        );
+      }
+    } else {
+      if (progress.confirmedCents > 0 || progress.reservedCents > 0) {
+        throw const ValidationException('This item is no longer available.');
+      }
+      if (data.amountCents != item.targetAmountCents) {
+        throw const ValidationException('This item must be gifted in full.');
+      }
+    }
+
     final now = DateTime.now();
     final contribution = Contribution(
       id: _newId('contrib'),

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/allowlist/presentation/allowlist_routes.dart';
 import '../../features/auth/presentation/auth_cubit.dart';
 import '../../features/auth/presentation/auth_routes.dart';
+import '../../features/contribute/presentation/contribute_routes.dart';
 import '../../features/items/presentation/item_routes.dart';
 import '../../features/lists/presentation/list_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
@@ -40,20 +41,7 @@ GoRouter createRouter(AuthCubit authCubit) {
         builder: (context, state) => _Landing(),
       ),
       ...PublicListRoutes.routes,
-      GoRoute(
-        path: RoutePaths.gift,
-        builder: (context, state) => const PlaceholderPage(
-          title: 'Contribute',
-          phase: 'Contribute flow + Pix — Phase 6',
-        ),
-      ),
-      GoRoute(
-        path: RoutePaths.thanks,
-        builder: (context, state) => const PlaceholderPage(
-          title: 'Thank you',
-          phase: 'Post-payment — Phase 6',
-        ),
-      ),
+      ...ContributeRoutes.routes,
       ...AuthRoutes.routes,
       ...ListRoutes.routes,
       ...ItemRoutes.routes,

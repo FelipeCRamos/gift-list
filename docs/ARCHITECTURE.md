@@ -115,7 +115,9 @@ spec §13.
    first implementation
 6. Contribute flow (QR + copia-e-cola + "I've paid") — includes reservation TTL
    and `allow_partial` cap enforcement (the cap gates the contribution amount, so
-   it lives with the flow rather than in trailing polish)
+   it lives with the flow rather than in trailing polish) — **done**; `GiftCubit`
+   reserves on QR generation, whole-item vs partial caps enforced in the mock
+   repository (authoritative) and mirrored in the cubit
 7. Contributions inbox + lazy expiry (confirm/reject + thank-you wall)
 8. Polish (image upload/compress, empty/error/loading states) — done on the mock
    `StorageRepository`. **Milestone: after this phase the entire app works

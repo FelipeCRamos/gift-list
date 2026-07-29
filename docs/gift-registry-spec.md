@@ -355,7 +355,7 @@ Root-scoped: `AuthCubit` (session). Feature-scoped (created via `BlocProvider` a
 - [ ] Item CRUD + images + `allow_partial` + ordering.
 - [ ] `/l/:slug` **gate logic**: access_info → open / needs-login / private / no-access / ready.
 - [ ] Public list view with PII-free progress badges (access-aware).
-- [ ] Contribute flow: contribution insert (anon or authed, contributor_id) + reservation TTL + **client-side BR Code (EMV + CRC16)** + QR + copy + "I've paid".
+- [x] Contribute flow: contribution insert (anon or authed, contributor_id) + reservation TTL + **client-side BR Code (EMV + CRC16)** + QR + copy + "I've paid". *(mock-backed; Supabase RLS insert lands in the backend phase)*
 - [ ] Contributions inbox: confirm/reject + thank-you wall.
 - [ ] Lazy expiry of stale reservations.
 - [ ] Cubit tree + DI wiring per §9; empty/error/loading states; BRL cent↔display formatting; merchant name/city sanitization.
