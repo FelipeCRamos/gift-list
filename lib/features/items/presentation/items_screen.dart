@@ -22,6 +22,7 @@ class ItemsScreen extends StatelessWidget {
           targetAmountCents: result.amountCents,
           allowPartial: result.allowPartial,
           description: result.description,
+          imageUrl: result.imageUrl,
         ),
       );
     }
@@ -40,6 +41,7 @@ class ItemsScreen extends StatelessWidget {
           description: result.description,
           targetAmountCents: result.amountCents,
           allowPartial: result.allowPartial,
+          imageUrl: result.imageUrl,
         ),
       );
     }
@@ -118,6 +120,10 @@ class _ItemTile extends StatelessWidget {
         children: [
           const Icon(Icons.drag_indicator),
           const SizedBox(width: 12),
+          if (item.imageUrl != null) ...[
+            GlNetworkImage(url: item.imageUrl, width: 44, height: 44),
+            const SizedBox(width: 12),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,12 +157,14 @@ class _ItemFormResult {
     required this.amountCents,
     required this.allowPartial,
     this.description,
+    this.imageUrl,
   });
 
   final String title;
   final int amountCents;
   final bool allowPartial;
   final String? description;
+  final String? imageUrl;
 }
 
 class _ItemDialog extends StatefulWidget {
@@ -174,6 +182,7 @@ class _ItemDialogState extends State<_ItemDialog> {
   final TextEditingController _description = TextEditingController();
   final TextEditingController _amount = TextEditingController();
   bool _allowPartial = false;
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -184,6 +193,7 @@ class _ItemDialogState extends State<_ItemDialog> {
       _description.text = item.description ?? '';
       _amount.text = (item.targetAmountCents / 100).toStringAsFixed(2);
       _allowPartial = item.allowPartial;
+      _imageUrl = item.imageUrl;
     }
   }
 
@@ -207,6 +217,7 @@ class _ItemDialogState extends State<_ItemDialog> {
         description: _description.text.trim().isEmpty
             ? null
             : _description.text.trim(),
+        imageUrl: _imageUrl,
       ),
     );
   }
@@ -248,6 +259,14 @@ class _ItemDialogState extends State<_ItemDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Description (optional)',
                 ),
+              ),
+              const SizedBox(height: 12),
+              GlImagePickerField(
+                label: 'Photo (optional)',
+                pathPrefix: 'items',
+                initialUrl: _imageUrl,
+                height: 120,
+                onChanged: (url) => setState(() => _imageUrl = url),
               ),
               const SizedBox(height: 4),
               SwitchListTile(

@@ -28,6 +28,7 @@ class _ListEditorScreenState extends State<ListEditorScreen> {
   Occasion _occasion = Occasion.other;
   PixKeyType _pixKeyType = PixKeyType.email;
   DateTime? _eventDate;
+  String? _coverImageUrl;
   bool _populated = false;
 
   @override
@@ -47,6 +48,7 @@ class _ListEditorScreenState extends State<ListEditorScreen> {
     _occasion = list.occasion;
     _pixKeyType = list.pixKeyType;
     _eventDate = list.eventDate;
+    _coverImageUrl = list.coverImageUrl;
     _populated = true;
   }
 
@@ -64,6 +66,7 @@ class _ListEditorScreenState extends State<ListEditorScreen> {
       pixKeyType: _pixKeyType,
       merchantName: _merchantName.text.trim(),
       eventDate: _eventDate,
+      coverImageUrl: _coverImageUrl,
     );
   }
 
@@ -138,6 +141,13 @@ class _ListEditorScreenState extends State<ListEditorScreen> {
         controller: _description,
         maxLines: 3,
         decoration: const InputDecoration(labelText: 'Description (optional)'),
+      ),
+      const SizedBox(height: 16),
+      GlImagePickerField(
+        label: 'Cover photo (optional)',
+        pathPrefix: 'lists/${widget.listId}/cover',
+        initialUrl: _coverImageUrl,
+        onChanged: (url) => setState(() => _coverImageUrl = url),
       ),
       const SizedBox(height: 16),
       ListTile(

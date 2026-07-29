@@ -121,8 +121,11 @@ spec §13.
 7. Contributions inbox + lazy expiry (confirm/reject + thank-you wall) —
    **done**; `ContributionsCubit` groups awaiting/confirmed/closed, lazy expiry
    is applied in the mock repository read
-8. Polish (image upload/compress, empty/error/loading states) — done on the mock
-   `StorageRepository`. **Milestone: after this phase the entire app works
+8. Polish (image upload/compress, empty/error/loading states) — **done** on the
+   mock `StorageRepository` (which returns a base64 `data:` URI so uploads render
+   in the mock build). Cover + item image pick/compress/upload via
+   `GlImagePickerField`; display via `GlNetworkImage`; async states were already
+   covered by `GlAsyncView`/`GlEmptyState`. **Milestone: the entire app now works
    end-to-end on mocks.**
 9. Supabase wiring (schema, RLS, RPCs, storage; swap DI) — stays last per
    [ADR-0003](decisions/0003-mock-first-backend.md): the whole app is built and

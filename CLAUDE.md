@@ -184,9 +184,13 @@ session; `/l/:slug` is gated dynamically per the list's visibility/auth settings
   `{feature}_routes.dart`.
 - Design-system widgets: `gl_*.dart` files with `Gl`-prefixed classes
   (`GlPageScaffold`, `GlFormLayout`, `GlAsyncView`, `GlBusyButton`,
-  `GlEmptyState`, `GlListCard`), barrel-exported from
-  `core/widgets/widgets.dart`. Build screens from these rather than raw Material
-  scaffolds/buttons so pages stay consistent.
+  `GlEmptyState`, `GlListCard`, `GlNetworkImage`, `GlImagePickerField`),
+  barrel-exported from `core/widgets/widgets.dart`. Build screens from these
+  rather than raw Material scaffolds/buttons so pages stay consistent.
+- Images: pick + compress via `GlImagePickerField` (uses `image_picker` and the
+  pure-Dart `compressImage` in `core/images/`), upload through `StorageRepository`,
+  display with `GlNetworkImage` (handles null/error and `data:` URIs). The mock
+  storage returns a base64 `data:` URI; the Supabase impl returns real URLs.
 
 ## Important Patterns
 

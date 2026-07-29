@@ -52,6 +52,15 @@ class _Content extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (list.coverImageUrl != null && list.coverImageUrl!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: GlNetworkImage(
+              url: list.coverImageUrl,
+              width: double.infinity,
+              height: 180,
+            ),
+          ),
         if (list.description != null && list.description!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -93,6 +102,14 @@ class _ItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (item.imageUrl != null && item.imageUrl!.isNotEmpty) ...[
+            GlNetworkImage(
+              url: item.imageUrl,
+              width: double.infinity,
+              height: 140,
+            ),
+            const SizedBox(height: 12),
+          ],
           Row(
             children: [
               Expanded(

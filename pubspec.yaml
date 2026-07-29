@@ -41,6 +41,8 @@ dependencies:
   equatable: ^2.1.0
   intl: ^0.20.3
   supabase_flutter: ^2.16.0
+  image_picker: ^1.1.2
+  image: ^4.3.0
 
 dev_dependencies:
   flutter_test:
