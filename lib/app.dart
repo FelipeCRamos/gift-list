@@ -11,7 +11,9 @@ import 'data/repositories/mock/in_memory_gift_registry_repository.dart';
 import 'data/repositories/mock/in_memory_storage_repository.dart';
 import 'data/repositories/storage_repository.dart';
 import 'features/auth/presentation/auth_cubit.dart';
+import 'services/payments/payment_instruction_service.dart';
 import 'services/pix/emv_pix_payload_service.dart';
+import 'services/pix/pix_instruction_service.dart';
 import 'services/pix/pix_payload_service.dart';
 
 /// App root. Injects the repository layer (mock today; swap one binding each for
@@ -35,6 +37,13 @@ class GiftListApp extends StatelessWidget {
         ),
         RepositoryProvider<PixPayloadService>(
           create: (_) => const EmvPixPayloadService(),
+        ),
+        // Payment seam: the contribute flow depends on this abstraction, not on
+        // Pix directly. Enabling a new method later = a resolver keyed by
+        // PaymentMethod; with one method today it is a single binding.
+        RepositoryProvider<PaymentInstructionService>(
+          create: (context) =>
+              PixInstructionService(context.read<PixPayloadService>()),
         ),
       ],
       child: BlocProvider<AuthCubit>(

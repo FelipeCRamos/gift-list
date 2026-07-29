@@ -88,7 +88,8 @@ lib/
       mock/                 # InMemory* implementations (current default)
       supabase/             # Supabase* implementations (later phase)
   services/
-    pix/                    # PixPayloadService (EMV BR Code + CRC16) — pure, no backend
+    payments/               # PaymentInstructionService seam (method-agnostic) — ADR-0004
+    pix/                    # PixPayloadService (EMV BR Code + CRC16) + PixInstructionService adapter — pure, no backend
   features/
     auth/ profile/ lists/ allowlist/ items/
     public_list/ contribute/ contributions/
@@ -158,6 +159,12 @@ session; `/l/:slug` is gated dynamically per the list's visibility/auth settings
   `services/pix/` — TLV fields + **CRC-16/CCITT-FALSE**. Deterministic, offline,
   **never call a third-party service**. Sanitize merchant name/city to ASCII and
   enforce max lengths (some banks reject non-conforming payloads).
+- **Payment method seam (ADR-0004):** the contribute flow depends on the
+  method-agnostic `PaymentInstructionService` (`services/payments/`), never on Pix
+  directly. Pix is one impl (`PixInstructionService`) wrapping the EMV engine; the
+  adapter **sanitizes**, the engine **validates**. `Payee` and `PaymentInstruction`
+  are **sealed** — a new method (PayPal link, IBAN, …) is an additive variant +
+  impl, not a change to the flow. Keep the EMV engine a narrow, Pix-only leaf.
 
 ## Code Style
 

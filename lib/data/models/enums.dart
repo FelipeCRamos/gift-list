@@ -76,6 +76,21 @@ enum ContributionStatus {
       values.firstWhere((e) => e.wire == value);
 }
 
+/// Payment mechanism used to instruct a contributor how to pay the creator.
+/// Pix is the only method in the MVP; the payment seam
+/// ([PaymentInstructionService]) is designed so new methods are additive — see
+/// docs/decisions/0004-payment-method-abstraction.md.
+enum PaymentMethod {
+  pix('pix');
+
+  const PaymentMethod(this.wire);
+
+  final String wire;
+
+  static PaymentMethod fromWire(String value) =>
+      values.firstWhere((e) => e.wire == value);
+}
+
 /// Derived per-item state exposed by the access-aware progress read.
 enum ItemState {
   open('open'),

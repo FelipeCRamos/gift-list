@@ -336,6 +336,11 @@ Root-scoped: `AuthCubit` (session). Feature-scoped (created via `BlocProvider` a
 
 - **Card + installments**: each creator gets their own PSP (e.g. Asaas) sub-account/account (KYC); generate dynamic charges (Pix à vista or card in N parcelas) to the creator's account; consume the PSP **webhook** to auto-confirm (drops the manual honor step). No cut taken → still no split/marketplace.
 - **Dynamic Pix auto-confirm** even without cards (PSP-issued dynamic Pix + webhook).
+- **Additional / international payment methods** (PayPal.me link, IBAN/SEPA
+  transfer, Wise/Revolut tag) for creators outside Brazil where Pix is
+  unavailable. The honor-based manual confirmation model already generalizes, and
+  the `PaymentInstructionService` seam (ADR-0004) makes each new method additive —
+  a `Payee` + `PaymentInstruction` variant + service impl + renderer.
 - **Phone allowlist** once SMS auth is funded.
 - Signed-URL private images; "my gifts" view for signed-in contributors; thank-you automation; contributor-covers-fee toggle; RSVP.
 

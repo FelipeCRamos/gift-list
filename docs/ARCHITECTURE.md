@@ -65,12 +65,19 @@ Single `GoRouter` (`core/routing/app_router.dart`); each feature contributes a
 ```
 GiftCubit (contribute)
   → GiftRegistryRepository.createContribution(NewContribution)   // awaiting_confirmation, txid, expires_at
-  → PixPayloadService.buildCopiaECola(...)                        // EMV TLV + CRC16, client-side
-  → UI renders QR (qr_flutter) + copia-e-cola + "I've paid"
+  → PaymentInstructionService.build(PaymentRequest)               // method-agnostic seam
+       └─ PixInstructionService (adapter): sanitize merchant → PixPayloadService.buildCopiaECola(...)
+                                                                   // EMV TLV + CRC16, client-side
+  → UI renders the PaymentInstruction (Pix: QR via qr_flutter + copia-e-cola) + "I've paid"
       ...creator later...
   ContributionsCubit → GiftRegistryRepository.confirmContribution(id)  // → confirmed
   PublicListCubit progress counts confirmed only
 ```
+
+The contribute flow depends only on `PaymentInstructionService`; Pix is one
+implementation. See [ADR-0004](decisions/0004-payment-method-abstraction.md) — a
+new payment method (PayPal link, IBAN transfer, …) is an additive `Payee` +
+`PaymentInstruction` variant + service impl, not a change to the flow.
 
 ## Money & formatting
 
@@ -102,7 +109,10 @@ spec §13.
 4. Public list + access gate (ListGateCubit's 5 states + PII-free progress;
    `/auth?from=` returns contributors to the list after sign-in) — **done**
 5. Pix core (EMV + CRC16), test-first — pure, zero backend; sequenced here
-   because only the contribute flow (Phase 6) depends on it
+   because only the contribute flow (Phase 6) depends on it — **done**; also
+   introduced the method-agnostic payment seam (`PaymentInstructionService`,
+   [ADR-0004](decisions/0004-payment-method-abstraction.md)) with Pix as the
+   first implementation
 6. Contribute flow (QR + copia-e-cola + "I've paid") — includes reservation TTL
    and `allow_partial` cap enforcement (the cap gates the contribution amount, so
    it lives with the flow rather than in trailing polish)
