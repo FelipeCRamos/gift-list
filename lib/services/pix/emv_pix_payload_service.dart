@@ -4,7 +4,7 @@ import 'pix_payload_service.dart';
 ///
 /// NOTE: This is a Phase 1 placeholder so DI can bind the service. The real,
 /// test-first implementation (TLV field assembly + CRC-16/CCITT-FALSE) lands in
-/// Phase 2 — see docs/gift-registry-spec.md §7.
+/// Phase 5 (Pix core) — see docs/gift-registry-spec.md §7.
 class EmvPixPayloadService extends PixPayloadService {
   const EmvPixPayloadService();
 
@@ -17,7 +17,7 @@ class EmvPixPayloadService extends PixPayloadService {
     required String txid,
   }) {
     throw UnimplementedError(
-      'EmvPixPayloadService is implemented in Phase 2 (Pix core).',
+      'EmvPixPayloadService is implemented in Phase 5 (Pix core).',
     );
   }
 }

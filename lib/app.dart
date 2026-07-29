@@ -15,7 +15,7 @@ import 'services/pix/emv_pix_payload_service.dart';
 import 'services/pix/pix_payload_service.dart';
 
 /// App root. Injects the repository layer (mock today; swap one binding each for
-/// Supabase in Phase 8) and provides the root [AuthCubit], then hands off to
+/// Supabase in Phase 9) and provides the root [AuthCubit], then hands off to
 /// go_router. See docs/ARCHITECTURE.md for the DI story.
 class GiftListApp extends StatelessWidget {
   const GiftListApp({super.key});

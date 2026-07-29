@@ -101,9 +101,16 @@ spec §13.
    — **done**
 4. Public list + access gate (ListGateCubit's 5 states + PII-free progress;
    `/auth?from=` returns contributors to the list after sign-in) — **done**
-5. Pix core (EMV + CRC16), test-first — **deferred to here** (only the contribute
-   flow needs it; nothing else depends on it)
-6. Contribute flow (QR + copia-e-cola + "I've paid")
-7. Contributions inbox + lazy expiry
-8. Supabase wiring (schema, RLS, RPCs, storage; swap DI)
-9. Polish (image upload/compress, states, partial caps)
+5. Pix core (EMV + CRC16), test-first — pure, zero backend; sequenced here
+   because only the contribute flow (Phase 6) depends on it
+6. Contribute flow (QR + copia-e-cola + "I've paid") — includes reservation TTL
+   and `allow_partial` cap enforcement (the cap gates the contribution amount, so
+   it lives with the flow rather than in trailing polish)
+7. Contributions inbox + lazy expiry (confirm/reject + thank-you wall)
+8. Polish (image upload/compress, empty/error/loading states) — done on the mock
+   `StorageRepository`. **Milestone: after this phase the entire app works
+   end-to-end on mocks.**
+9. Supabase wiring (schema, RLS, RPCs, storage; swap DI) — stays last per
+   [ADR-0003](decisions/0003-mock-first-backend.md): the whole app is built and
+   polished mock-first, then the backend is swapped in once behind the repository
+   interfaces, leaving only backend-specific concerns (RLS, latency) to resolve
