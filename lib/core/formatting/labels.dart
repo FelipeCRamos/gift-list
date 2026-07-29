@@ -38,3 +38,16 @@ String contributorAuthLabel(ContributorAuth auth) {
       return 'Login required';
   }
 }
+
+String contributionStatusLabel(ContributionStatus status) {
+  switch (status) {
+    case ContributionStatus.awaitingConfirmation:
+      return 'Awaiting confirmation';
+    case ContributionStatus.confirmed:
+      return 'Confirmed';
+    case ContributionStatus.cancelled:
+      return 'Cancelled';
+    case ContributionStatus.expired:
+      return 'Expired';
+  }
+}

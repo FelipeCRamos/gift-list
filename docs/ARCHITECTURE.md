@@ -118,7 +118,9 @@ spec §13.
    it lives with the flow rather than in trailing polish) — **done**; `GiftCubit`
    reserves on QR generation, whole-item vs partial caps enforced in the mock
    repository (authoritative) and mirrored in the cubit
-7. Contributions inbox + lazy expiry (confirm/reject + thank-you wall)
+7. Contributions inbox + lazy expiry (confirm/reject + thank-you wall) —
+   **done**; `ContributionsCubit` groups awaiting/confirmed/closed, lazy expiry
+   is applied in the mock repository read
 8. Polish (image upload/compress, empty/error/loading states) — done on the mock
    `StorageRepository`. **Milestone: after this phase the entire app works
    end-to-end on mocks.**

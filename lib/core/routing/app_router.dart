@@ -7,6 +7,7 @@ import '../../features/allowlist/presentation/allowlist_routes.dart';
 import '../../features/auth/presentation/auth_cubit.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/contribute/presentation/contribute_routes.dart';
+import '../../features/contributions/presentation/contributions_routes.dart';
 import '../../features/items/presentation/item_routes.dart';
 import '../../features/lists/presentation/list_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
@@ -47,13 +48,7 @@ GoRouter createRouter(AuthCubit authCubit) {
       ...ItemRoutes.routes,
       ...AllowlistRoutes.routes,
       ...ProfileRoutes.routes,
-      GoRoute(
-        path: RoutePaths.listContributions,
-        builder: (context, state) => const PlaceholderPage(
-          title: 'Contributions',
-          phase: 'Contributions inbox — Phase 7',
-        ),
-      ),
+      ...ContributionsRoutes.routes,
     ],
     errorBuilder: (context, state) =>
         PlaceholderPage(title: 'Not found', phase: state.uri.toString()),
