@@ -49,7 +49,14 @@ class ListsScreen extends StatelessWidget {
         icon: const Icon(Icons.add),
         label: const Text('New list'),
       ),
-      body: BlocBuilder<ListsCubit, ListsState>(
+      body: BlocConsumer<ListsCubit, ListsState>(
+        listenWhen: (a, b) =>
+            b.errorMessage != null && a.errorMessage != b.errorMessage,
+        listener: (context, state) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+        },
         builder: (context, state) {
           return GlAsyncView(
             loading:
