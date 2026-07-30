@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -206,6 +207,10 @@ class _ListEditorScreenState extends State<ListEditorScreen> {
         value: state.isPublished,
         onChanged: cubit.togglePublished,
       ),
+      if (state.isPublished && state.list != null) ...[
+        const SizedBox(height: 8),
+        _ShareLink(slug: state.list!.slug, isPrivate: state.isPrivate),
+      ],
       const Divider(height: 32),
       _ManageLinks(listId: widget.listId, isPrivate: state.isPrivate),
       const SizedBox(height: 24),
@@ -261,6 +266,65 @@ class _AccessControls extends StatelessWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// Shows the public share URL for a published list with a copy button.
+class _ShareLink extends StatelessWidget {
+  const _ShareLink({required this.slug, required this.isPrivate});
+
+  final String slug;
+  final bool isPrivate;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String url = RoutePaths.shareableListUrl(slug);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Share link', style: theme.textTheme.titleSmall),
+        const SizedBox(height: 4),
+        Text(
+          isPrivate
+              ? 'Allowlisted people can open this after signing in.'
+              : 'Anyone with this link can open the list.',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.outline,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: SelectableText(url, style: theme.textTheme.bodySmall),
+              ),
+              const SizedBox(width: 8),
+              FilledButton.tonalIcon(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: url));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Link copied — share it with friends.'),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.copy, size: 18),
+                label: const Text('Copy'),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

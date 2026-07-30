@@ -22,6 +22,12 @@ abstract final class RoutePaths {
   static String authFrom(String location) =>
       '$auth?from=${Uri.encodeQueryComponent(location)}';
   static String toListView(String slug) => '/l/$slug';
+
+  /// Full, shareable public URL for a list. Hash-based to match the web app's
+  /// default URL strategy (no `usePathUrlStrategy`), e.g.
+  /// `https://host/#/l/casa-nova-ana`.
+  static String shareableListUrl(String slug) =>
+      '${Uri.base.origin}/#${toListView(slug)}';
   static String toGift(String slug, String itemId) => '/l/$slug/gift/$itemId';
   static String toThanks(String slug) => '/l/$slug/thanks';
   static String toListEdit(String id) => '/dashboard/lists/$id/edit';
