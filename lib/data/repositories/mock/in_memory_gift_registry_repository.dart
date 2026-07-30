@@ -59,8 +59,12 @@ class InMemoryGiftRegistryRepository implements GiftRegistryRepository {
   }
 
   String _newId(String prefix) {
-    final String n = _rng.nextInt(1 << 32).toRadixString(16).padLeft(8, '0');
-    final String t = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+    // Web-safe: DateTime.microsecondsSinceEpoch throws UnsupportedError on
+    // Flutter web (JS has only ms precision), and shifts >= 32 bits are
+    // unreliable on web (JS bitwise ops are 32-bit). The random suffix keeps
+    // ids unique within a millisecond.
+    final String n = _rng.nextInt(1 << 30).toRadixString(16).padLeft(8, '0');
+    final String t = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
     return '$prefix-$t$n';
   }
 
