@@ -187,8 +187,9 @@ session; `/l/:slug` is gated dynamically per the list's visibility/auth settings
   `GlEmptyState`, `GlListCard`, `GlNetworkImage`, `GlImagePickerField`),
   barrel-exported from `core/widgets/widgets.dart`. Build screens from these
   rather than raw Material scaffolds/buttons so pages stay consistent.
-- Images: pick + compress via `GlImagePickerField` (uses `image_picker` and the
-  pure-Dart `compressImage` in `core/images/`), upload through `StorageRepository`,
+- Images: tap-pick (`image_picker`) or drag-and-drop (`desktop_drop`) + compress
+  (pure-Dart `compressImage` in `core/images/`) via `GlImagePickerField`, upload
+  through `StorageRepository`,
   display with `GlNetworkImage` (handles null/error and `data:` URIs). The mock
   storage returns a base64 `data:` URI; the Supabase impl returns real URLs.
 

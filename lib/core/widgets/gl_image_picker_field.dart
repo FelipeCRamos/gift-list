@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:desktop_drop/desktop_drop.dart'
+    show DropDoneDetails, DropTarget;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,9 +10,10 @@ import '../../data/repositories/storage_repository.dart';
 import '../images/image_compression.dart';
 import 'gl_network_image.dart';
 
-/// Picks an image, compresses it, uploads it via [StorageRepository], and
-/// reports the resulting URL through [onChanged] (null when removed). Shows a
-/// live preview and handles the busy/error states internally.
+/// Adds an image by tap-to-pick or by dragging a file from the computer,
+/// compresses it, uploads it via [StorageRepository], and reports the resulting
+/// URL through [onChanged] (null when removed). Shows a live preview and handles
+/// the busy/error states internally.
 class GlImagePickerField extends StatefulWidget {
   const GlImagePickerField({
     required this.pathPrefix,
@@ -33,9 +36,19 @@ class GlImagePickerField extends StatefulWidget {
 }
 
 class _GlImagePickerFieldState extends State<GlImagePickerField> {
+  static const List<String> _imageExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.webp',
+    '.bmp',
+  ];
+
   final ImagePicker _picker = ImagePicker();
   String? _url;
   bool _busy = false;
+  bool _dragging = false;
 
   @override
   void initState() {
@@ -48,9 +61,25 @@ class _GlImagePickerFieldState extends State<GlImagePickerField> {
     if (file == null) {
       return;
     }
+    await _upload(await file.readAsBytes());
+  }
+
+  Future<void> _onDrop(DropDoneDetails detail) async {
+    setState(() => _dragging = false);
+    if (detail.files.isEmpty) {
+      return;
+    }
+    final XFile file = detail.files.first;
+    if (!_looksLikeImage(file)) {
+      _showError('Please drop an image file.');
+      return;
+    }
+    await _upload(await file.readAsBytes());
+  }
+
+  Future<void> _upload(Uint8List raw) async {
     setState(() => _busy = true);
     try {
-      final Uint8List raw = await file.readAsBytes();
       final Uint8List compressed = compressImage(raw);
       if (!mounted) {
         return;
@@ -72,10 +101,17 @@ class _GlImagePickerFieldState extends State<GlImagePickerField> {
         return;
       }
       setState(() => _busy = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not upload the image.')),
-      );
+      _showError('Could not upload the image.');
     }
+  }
+
+  bool _looksLikeImage(XFile file) {
+    final String? mime = file.mimeType;
+    if (mime != null && mime.isNotEmpty) {
+      return mime.startsWith('image/');
+    }
+    final String name = file.name.toLowerCase();
+    return _imageExtensions.any(name.endsWith);
   }
 
   void _remove() {
@@ -83,26 +119,64 @@ class _GlImagePickerFieldState extends State<GlImagePickerField> {
     widget.onChanged(null);
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.label, style: Theme.of(context).textTheme.bodyMedium),
         const SizedBox(height: 8),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            GlNetworkImage(
-              url: _url,
-              height: widget.height,
-              width: double.infinity,
-            ),
-            if (_busy)
-              const Positioned.fill(
-                child: Center(child: CircularProgressIndicator()),
+        DropTarget(
+          onDragEntered: (_) => setState(() => _dragging = true),
+          onDragExited: (_) => setState(() => _dragging = false),
+          onDragDone: _onDrop,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              GlNetworkImage(
+                url: _url,
+                height: widget.height,
+                width: double.infinity,
               ),
-          ],
+              if (_dragging)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: scheme.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: scheme.primary, width: 2),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Drop image to upload',
+                        style: TextStyle(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (_busy)
+                const Positioned.fill(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Tap to choose, or drag an image here.',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: scheme.outline),
         ),
         const SizedBox(height: 8),
         Row(
